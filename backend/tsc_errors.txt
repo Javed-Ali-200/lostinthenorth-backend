@@ -1,0 +1,34 @@
+﻿src/modules/cars/car.controller.ts(15,38): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/modules/cars/car.controller.ts(53,45): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/modules/cars/car.controller.ts(60,33): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/modules/customTrips/customTrip.controller.ts(51,49): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/modules/hotels/hotel.controller.ts(21,42): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/modules/hotels/hotel.controller.ts(43,49): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/modules/hotels/hotel.controller.ts(50,35): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/modules/tours/tour.controller.ts(29,40): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/modules/tours/tour.controller.ts(61,47): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/modules/tours/tour.controller.ts(73,34): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/routes/admin.routes.ts(2,44): error TS2307: Cannot find module '../middleware/auth.middleware' or its corresponding type declarations.
+src/routes/admin.routes.ts(3,24): error TS2307: Cannot find module '../middleware/upload.middleware' or its corresponding type declarations.
+src/routes/admin.routes.ts(31,8): error TS2307: Cannot find module '../controllers/admin.controller' or its corresponding type declarations.
+src/routes/auth.routes.ts(2,47): error TS2307: Cannot find module '../controllers/auth.controller' or its corresponding type declarations.
+src/routes/auth.routes.ts(3,30): error TS2307: Cannot find module '../middleware/auth.middleware' or its corresponding type declarations.
+src/routes/user.routes.ts(2,30): error TS2307: Cannot find module '../middleware/auth.middleware' or its corresponding type declarations.
+src/routes/user.routes.ts(22,8): error TS2307: Cannot find module '../controllers/user.controller' or its corresponding type declarations.
+src/utils/jwt.ts(16,16): error TS2769: No overload matches this call.
+  Overload 1 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: null, options?: (SignOptions & { algorithm: "none"; }) | undefined): string', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'null'.
+  Overload 2 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: Buffer<ArrayBufferLike> | Secret | PrivateKeyInput | JsonWebKeyInput, options?: SignOptions | undefined): string', gave the following error.
+    Type 'string' is not assignable to type 'number | StringValue | undefined'.
+  Overload 3 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: Buffer<ArrayBufferLike> | Secret | PrivateKeyInput | JsonWebKeyInput, callback: SignCallback): void', gave the following error.
+    Object literal may only specify known properties, and 'expiresIn' does not exist in type 'SignCallback'.

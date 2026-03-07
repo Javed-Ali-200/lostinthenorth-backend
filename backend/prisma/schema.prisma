@@ -1,0 +1,228 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ServiceType {
+  TOUR
+  CAR
+  HOTEL
+  OFFER
+  CUSTOM
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  REFUNDED
+  FAILED
+}
+
+enum CustomTripStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  MODIFIED
+}
+
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  name        String
+  password    String
+  role        Role     @default(USER)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  bookings    Booking[]
+  customTrips CustomTrip[]
+
+  @@map("users")
+}
+
+model Tour {
+  id           String   @id @default(uuid())
+  title        String
+  description  String   @db.Text
+  price        Float
+  duration     Int // in days
+  location     String
+  images       String[] // Array of image URLs
+  featured     Boolean  @default(false)
+  itinerary    String?  @db.Text // JSON string
+  included     String[] // What's included
+  excluded     String[] // What's not included
+  maxGroupSize Int      @default(20)
+  available    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  bookings Booking[]
+
+  @@map("tours")
+}
+
+model Offer {
+  id          String      @id @default(uuid())
+  title       String
+  description String      @db.Text
+  image       String
+  price       Float
+  discount    Float       @default(0) // Discount percentage
+  validUntil  DateTime?
+  active      Boolean     @default(true)
+  serviceType ServiceType @default(TOUR)
+  serviceId   String? // Reference to Tour, Car, or Hotel
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  bookings Booking[]
+
+  @@map("offers")
+}
+
+model Car {
+  id           String   @id @default(uuid())
+  name         String
+  type         String // SUV, Sedan, Van, etc.
+  pricePerDay  Float
+  image        String
+  images       String[] // Additional images
+  features     String[] // AC, GPS, etc.
+  seats        Int
+  transmission String // Manual, Automatic
+  fuelType     String // Petrol, Diesel, Electric
+  available    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  bookings    Booking[]
+  customTrips CustomTrip[]
+
+  @@map("cars")
+}
+
+model Hotel {
+  id            String   @id @default(uuid())
+  name          String
+  location      String
+  description   String   @db.Text
+  pricePerNight Float
+  images        String[]
+  amenities     String[] // WiFi, Pool, Gym, etc.
+  rating        Float    @default(0)
+  roomTypes     String[] // Single, Double, Suite
+  available     Boolean  @default(true)
+  address       String?
+  phone         String?
+  email         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  bookings    Booking[]
+  customTrips CustomTrip[]
+
+  @@map("hotels")
+}
+
+model Booking {
+  id              String        @id @default(uuid())
+  bookingNumber   String        @unique
+  // Guest customer info (no account required)
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  // Optional user relation (for future logged-in users)
+  userId          String?
+  serviceType     ServiceType
+  serviceId       String // ID of Tour, Car, Hotel, or Offer
+  startDate       DateTime
+  endDate         DateTime
+  totalPrice      Float
+  numberOfPeople  Int           @default(1)
+  status          BookingStatus @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING)
+  specialRequests String?       @db.Text
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  user    User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  payment Payment?
+
+  // Optional relations based on serviceType
+  tour    Tour?   @relation(fields: [tourId], references: [id])
+  tourId  String?
+  car     Car?    @relation(fields: [carId], references: [id])
+  carId   String?
+  hotel   Hotel?  @relation(fields: [hotelId], references: [id])
+  hotelId String?
+  offer   Offer?  @relation(fields: [offerId], references: [id])
+  offerId String?
+
+  @@map("bookings")
+}
+
+model CustomTrip {
+  id             String           @id @default(uuid())
+  // Guest customer info
+  customerName   String
+  customerEmail  String
+  customerPhone  String
+  // Optional user relation
+  userId         String?
+  destination    String
+  hotelId        String?
+  carId          String?
+  days           Int
+  activities     String           @db.Text // JSON string or comma-separated
+  totalPrice     Float            @default(0)
+  status         CustomTripStatus @default(PENDING)
+  adminNotes     String?          @db.Text
+  startDate      DateTime?
+  numberOfPeople Int              @default(1)
+  posterImage    String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  user  User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  hotel Hotel? @relation(fields: [hotelId], references: [id])
+  car   Car?   @relation(fields: [carId], references: [id])
+
+  @@map("custom_trips")
+}
+
+model Payment {
+  id              String        @id @default(uuid())
+  bookingId       String        @unique
+  amount          Float
+  currency        String        @default("usd")
+  status          PaymentStatus @default(PENDING)
+  stripePaymentId String?
+  paymentMethod   String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}

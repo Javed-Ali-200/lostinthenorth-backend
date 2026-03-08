@@ -13,7 +13,7 @@ const router = Router();
  * @desc    Guest submits a custom trip request
  * @access  Public
  */
-router.post('/', upload.single('posterImage'), validate(createCustomTripSchema), createCustomTrip);
+router.post('/', upload.single('image'), validate(createCustomTripSchema), createCustomTrip);
 
 // ─── Admin Routes ─────────────────────────────────────────────────────────────
 /**
@@ -21,6 +21,6 @@ router.post('/', upload.single('posterImage'), validate(createCustomTripSchema),
  * @route   PATCH /api/admin/custom-trips/:id
  */
 router.get('/admin', authenticate as any, requireAdmin as any, listCustomTrips as any);
-router.patch('/admin/:id', authenticate as any, requireAdmin as any, upload.single('posterImage'), validate(updateCustomTripSchema), updateCustomTrip as any);
+router.patch('/admin/:id', authenticate as any, requireAdmin as any, upload.single('image'), validate(updateCustomTripSchema), updateCustomTrip as any);
 
 export default router;

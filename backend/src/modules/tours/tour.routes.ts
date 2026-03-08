@@ -24,10 +24,10 @@ router.get('/:id', getTour);
 // ─── Admin Routes ─────────────────────────────────────────────────────────────
 
 /** POST /api/tours */
-router.post('/', authenticate as any, requireAdmin as any, upload.array('images', 5), validate(createTourSchema), createTour);
+router.post('/', authenticate as any, requireAdmin as any, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'images', maxCount: 5 }]), validate(createTourSchema), createTour);
 
 /** PATCH /api/tours/:id */
-router.patch('/:id', authenticate as any, requireAdmin as any, upload.array('images', 5), validate(updateTourSchema), updateTour);
+router.patch('/:id', authenticate as any, requireAdmin as any, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'images', maxCount: 5 }]), validate(updateTourSchema), updateTour);
 
 /** DELETE /api/tours/:id */
 router.delete('/:id', authenticate as any, requireAdmin as any, deleteTour);

@@ -9,8 +9,8 @@ const router = Router();
 
 router.get('/', listHotels);
 router.get('/:id', getHotel);
-router.post('/', authenticate as any, requireAdmin as any, upload.array('images', 5), validate(createHotelSchema), createHotel);
-router.patch('/:id', authenticate as any, requireAdmin as any, upload.array('images', 5), validate(updateHotelSchema), updateHotel);
+router.post('/', authenticate as any, requireAdmin as any, upload.fields([{ name: 'images', maxCount: 5 }]), validate(createHotelSchema), createHotel);
+router.patch('/:id', authenticate as any, requireAdmin as any, upload.fields([{ name: 'images', maxCount: 5 }]), validate(updateHotelSchema), updateHotel);
 router.delete('/:id', authenticate as any, requireAdmin as any, deleteHotel);
 
 export default router;

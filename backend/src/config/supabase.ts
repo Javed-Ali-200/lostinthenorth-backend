@@ -3,4 +3,4 @@ import env from './env.js';
 
 const supabase: SupabaseClient = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
 
-export default supabase;
+export default supabase

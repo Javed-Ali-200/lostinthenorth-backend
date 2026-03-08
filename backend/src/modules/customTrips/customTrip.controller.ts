@@ -16,7 +16,7 @@ export const createCustomTrip = async (req: Request, res: Response, next: NextFu
     try {
         const tripData = { ...req.body };
         if (req.file) {
-            tripData.posterImage = await uploadToSupabase(req.file, 'custom-trips');
+            tripData.image = await uploadToSupabase(req.file, 'custom-trips');
         }
         const trip = await submitCustomTrip(tripData);
         return successResponse(res, trip, 'Custom trip request submitted successfully', 201);
@@ -46,7 +46,7 @@ export const updateCustomTrip = async (req: Request, res: Response, next: NextFu
     try {
         const tripData = { ...req.body };
         if (req.file) {
-            tripData.posterImage = await uploadToSupabase(req.file, 'custom-trips');
+            tripData.image = await uploadToSupabase(req.file, 'custom-trips');
         }
         const trip = await updateCustomTripById(req.params.id as string, tripData);
         return successResponse(res, trip, 'Custom trip updated successfully');

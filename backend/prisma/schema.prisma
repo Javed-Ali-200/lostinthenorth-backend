@@ -67,7 +67,8 @@ model Tour {
   price        Float
   duration     Int // in days
   location     String
-  images       String[] // Array of image URLs
+  image        String?  // Main poster image
+  images       String[] // Array of gallery image URLs
   featured     Boolean  @default(false)
   itinerary    String?  @db.Text // JSON string
   included     String[] // What's included
@@ -128,6 +129,7 @@ model Hotel {
   location      String
   description   String   @db.Text
   pricePerNight Float
+  image         String?
   images        String[]
   amenities     String[] // WiFi, Pool, Gym, etc.
   rating        Float    @default(0)
@@ -200,7 +202,7 @@ model CustomTrip {
   adminNotes     String?          @db.Text
   startDate      DateTime?
   numberOfPeople Int              @default(1)
-  posterImage    String?
+  image          String?          // Renamed from posterImage for consistency
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
 

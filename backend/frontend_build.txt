@@ -1,0 +1,24 @@
+﻿npx : You are using 
+Node.js 18.20.8. For 
+Next.js, Node.js 
+version ">=20.9.0" is 
+required.
+At line:1 char:44
++ ... et-Location 
+"E:\travel 
+website\frontend"; npx 
+next build 2>&1 | 
+Selec ...
++                      
+                       
+  ~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (You are using   
+  N...0" is require    
+d.:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 

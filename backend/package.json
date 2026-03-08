@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "The Lost in the North — Travel Platform Backend API",
   "main": "src/server.ts",
+  "prisma": {
+  "seed": "ts-node prisma/seed.ts"
+},
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
@@ -21,15 +24,24 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@prisma/client": "^5.22.0",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-toast": "^1.2.15",
     "@supabase/supabase-js": "^2.91.1",
     "bcryptjs": "^3.0.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "express-rate-limit": "^8.2.1",
+    "framer-motion": "^12.35.1",
     "jsonwebtoken": "^9.0.3",
-    "multer": "^1.4.5-lts.1"
+    "multer": "^1.4.5-lts.1",
+    "react-hot-toast": "^2.6.0",
+    "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
@@ -40,7 +52,8 @@
     "@types/node": "^25.3.5",
     "nodemon": "^3.1.11",
     "prisma": "^5.22.0",
+    "ts-node": "^10.9.2",
     "tsx": "^4.19.3",
-    "typescript": "^5.7.3"
+    "typescript": "^5.9.3"
   }
 }

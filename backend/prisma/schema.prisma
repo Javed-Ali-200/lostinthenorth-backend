@@ -22,13 +22,16 @@ enum ServiceType {
   HOTEL
   OFFER
   CUSTOM
+  TREKKING
 }
 
 enum BookingStatus {
   PENDING
   CONFIRMED
-  CANCELLED
+  PREPARING
+  EXPEDITION_LIVE
   COMPLETED
+  CANCELLED
 }
 
 enum PaymentStatus {
@@ -51,7 +54,8 @@ model User {
   name        String
   password    String
   role        Role     @default(USER)
-  createdAt   DateTime @default(now())
+  refreshToken String?
+  createdAt    DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   bookings    Booking[]
@@ -165,6 +169,7 @@ model Booking {
   status          BookingStatus @default(PENDING)
   paymentStatus   PaymentStatus @default(PENDING)
   specialRequests String?       @db.Text
+  addOns          String[]      @default([])
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
@@ -180,8 +185,38 @@ model Booking {
   hotelId String?
   offer   Offer?  @relation(fields: [offerId], references: [id])
   offerId String?
+  trekking   Trekking? @relation(fields: [trekkingId], references: [id])
+  trekkingId String?
 
   @@map("bookings")
+}
+
+model Trekking {
+  id           String   @id @default(uuid())
+  title        String
+  description  String   @db.Text
+  price        Float
+  duration     Int // in days
+  location     String
+  image        String?  // Main poster image
+  images       String[] // Array of gallery image URLs
+  difficulty   String   @default("Moderate") // Moderate, Challenging, Extreme
+  rating       Float    @default(4.8)
+  reviewsCount Int      @default(50)
+  featured     Boolean  @default(false)
+  itinerary    String?  @db.Text // JSON string
+  included     String[] // What's included
+  excluded     String[] // What's not included
+  highlights   String[] // Trek highlights for sidebar
+  locationTags String[] // Karakoram, Himalayas, etc.
+  maxGroupSize Int      @default(12)
+  available    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  bookings Booking[]
+
+  @@map("trekkings")
 }
 
 model CustomTrip {

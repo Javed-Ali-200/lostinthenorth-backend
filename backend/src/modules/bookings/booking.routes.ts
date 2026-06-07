@@ -4,6 +4,7 @@ import {
     listBookings,
     getBooking,
     updateBookingStatus,
+    trackBooking,
 } from './booking.controller.js';
 import { authenticate, requireAdmin } from '../../middlewares/auth.middleware.js';
 import { validate } from '../../middlewares/validate.middleware.js';
@@ -18,6 +19,7 @@ const router = Router();
  * @access  Public (no auth required)
  */
 router.post('/', validate(createBookingSchema), createBooking);
+router.get('/track', trackBooking);
 
 // ─── Admin Routes ─────────────────────────────────────────────────────────────
 /**

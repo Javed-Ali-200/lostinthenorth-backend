@@ -7,6 +7,7 @@ import hotelRoutes from '../modules/hotels/hotel.routes.js';
 import carRoutes from '../modules/cars/car.routes.js';
 import bookingRoutes from '../modules/bookings/booking.routes.js';
 import customTripRoutes from '../modules/customTrips/customTrip.routes.js';
+import trekkingRoutes from '../modules/trekkings/trekking.routes.js';
 
 const router = Router();
 
@@ -27,6 +28,10 @@ router.use('/hotels', hotelRoutes);
 // GET  /api/cars
 // POST /api/cars           (admin)
 router.use('/cars', carRoutes);
+
+// GET  /api/trekkings
+// POST /api/trekkings      (admin)
+router.use('/trekkings', trekkingRoutes);
 
 // ─── Booking Routes ───────────────────────────────────────────────────────────
 // POST  /api/bookings              (guest)

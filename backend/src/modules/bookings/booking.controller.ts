@@ -4,6 +4,7 @@ import {
     getAllBookings,
     getBookingById,
     updateBookingStatusById,
+    trackBooking as trackBookingService,
 } from './booking.service.js';
 import { successResponse } from '../../utils/apiResponse.js';
 
@@ -54,6 +55,23 @@ export const updateBookingStatus = async (req: Request, res: Response, next: Nex
     try {
         const booking = await updateBookingStatusById(req.params.id as string, req.body.status);
         return successResponse(res, booking, 'Booking status updated successfully');
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * GET /api/bookings/track
+ * Guest tracks their booking using reference and email.
+ */
+export const trackBooking = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { bookingNumber, email } = req.query;
+        if (!bookingNumber || !email) {
+            return res.status(400).json({ success: false, message: 'Booking reference and email are required' });
+        }
+        const booking = await trackBookingService(bookingNumber as string, email as string);
+        return successResponse(res, booking, 'Booking found successfully');
     } catch (error) {
         next(error);
     }

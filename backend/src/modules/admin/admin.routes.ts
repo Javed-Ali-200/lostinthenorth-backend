@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { adminLogin, getMe, updatePassword } from './admin.controller.js';
+import { adminLogin, getMe, updatePassword, refreshToken } from './admin.controller.js';
 import { authenticate, requireAdmin } from '../../middlewares/auth.middleware.js';
 import { validate } from '../../middlewares/validate.middleware.js';
 
@@ -19,6 +19,21 @@ router.post(
         },
     }),
     adminLogin as any,
+);
+
+/**
+ * @route   POST /api/admin/refresh
+ * @desc    Refresh access token
+ * @access  Public (requires valid refresh token in body)
+ */
+router.post(
+    '/refresh',
+    validate({
+        body: {
+            refreshToken: { required: true, type: 'string' },
+        },
+    }),
+    refreshToken as any,
 );
 
 /**

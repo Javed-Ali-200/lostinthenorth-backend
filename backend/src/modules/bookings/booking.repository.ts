@@ -57,3 +57,22 @@ export const findBookingById = async (id: string): Promise<Booking | null> => {
 export const updateBookingStatus = async (id: string, status: string): Promise<Booking> => {
     return prisma.booking.update({ where: { id }, data: { status: status as any } });
 };
+
+/**
+ * Find a booking by booking number and customer email (for tracking).
+ */
+export const findBookingByReferenceAndEmail = async (
+    bookingNumber: string,
+    customerEmail: string
+): Promise<Booking | null> => {
+    return prisma.booking.findFirst({
+        where: {
+            bookingNumber,
+            customerEmail: {
+                equals: customerEmail,
+                mode: 'insensitive',
+            },
+        },
+        include: { tour: true, hotel: true, car: true, offer: true, payment: true },
+    });
+};

@@ -7,6 +7,9 @@ export const createBookingSchema = {
         serviceId: { required: true, type: 'string' as const },
         startDate: { required: true, type: 'string' as const },
         endDate: { required: true, type: 'string' as const },
+        numberOfPeople: { required: false, type: 'number' as const },
+        specialRequests: { required: false, type: 'string' as const },
+        addOns: { required: false, type: 'string' as const }, // Frontend sends array, but we can treat as string/json if needed or just optional
     },
 };
 
@@ -18,7 +21,7 @@ export const updateBookingStatusSchema = {
         status: {
             required: true,
             type: 'string' as const,
-            enum: ['PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED'],
+            enum: ['PENDING', 'CONFIRMED', 'PREPARING', 'EXPEDITION_LIVE', 'COMPLETED', 'CANCELLED'],
         },
     },
 };

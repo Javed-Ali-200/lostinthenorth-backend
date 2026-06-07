@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { loginAdmin, getAdminProfile, changeAdminPassword } from './admin.service.js';
+import { loginAdmin, getAdminProfile, changeAdminPassword, refreshAdminToken } from './admin.service.js';
 import { successResponse } from '../../utils/apiResponse.js';
 import { AuthenticatedRequest } from '../../middlewares/auth.middleware.js';
 
@@ -12,6 +12,22 @@ export const adminLogin = async (req: Request, res: Response, next: NextFunction
         const { email, password } = req.body;
         const result = await loginAdmin(email, password);
         return successResponse(res, result, 'Login successful');
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * POST /api/admin/refresh
+ * Refresh access token using refresh token.
+ */
+export const refreshToken = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { refreshToken: rToken } = req.body;
+        if (!rToken) return next(new Error('Refresh token is required'));
+        
+        const result = await refreshAdminToken(rToken);
+        return successResponse(res, result, 'Token refreshed');
     } catch (error) {
         next(error);
     }
@@ -43,3 +59,4 @@ export const updatePassword = async (req: AuthenticatedRequest, res: Response, n
         next(error);
     }
 };
+    

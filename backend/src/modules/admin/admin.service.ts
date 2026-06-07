@@ -1,12 +1,15 @@
 import bcrypt from 'bcryptjs';
 import { findUserByEmail, findUserById, updatePassword } from './admin.repository.js';
-import { generateToken } from '../../utils/jwt.js';
+import { generateRefreshToken, generateToken } from '../../utils/jwt.js';
 import { AppError } from '../../middlewares/error.middleware.js';
 import prisma from '../../config/prisma.js';
 import { User } from '@prisma/client';
 
+/* The `export interface LoginResult` is defining a TypeScript interface named `LoginResult`. This
+interface specifies the structure of the object that will be returned by the `loginAdmin` function. */
 export interface LoginResult {
     token: string;
+    refreshToken: string;
     admin: {
         id: string;
         email: string;
@@ -35,6 +38,14 @@ export const loginAdmin = async (email: string, password: string): Promise<Login
     }
 
     const token = generateToken({ id: user.id, email: user.email, role: user.role });
+    const refreshToken = generateRefreshToken({ id: user.id, email: user.email, role: user.role });
+
+    // Store hashed refresh token in DB
+    const hashedRT = await bcrypt.hash(refreshToken, 10);
+    await prisma.user.update({
+        where: { id: user.id },
+        data: { refreshToken: hashedRT }
+    });
 
     const admin = {
         id: user.id,
@@ -43,7 +54,42 @@ export const loginAdmin = async (email: string, password: string): Promise<Login
         role: user.role,
     };
 
-    return { token, admin };
+    return { token, refreshToken, admin };
+};
+
+/**
+ * Refresh an expired access token using a valid refresh token.
+ */
+export const refreshAdminToken = async (rToken: string): Promise<{ token: string; refreshToken: string }> => {
+    try {
+        const decoded = await import('../../utils/jwt.js').then(m => m.verifyRefreshToken(rToken));
+        const user = await prisma.user.findUnique({ where: { id: decoded.id } });
+
+        if (!user || !user.refreshToken) {
+            throw new AppError('Invalid refresh token.', 401);
+        }
+
+        // Compare provided token with hashed token in DB
+        const isMatch = await bcrypt.compare(rToken, user.refreshToken);
+        if (!isMatch) {
+            throw new AppError('Invalid refresh token.', 401);
+        }
+
+        // Generate new pair
+        const token = generateToken({ id: user.id, email: user.email, role: user.role });
+        const refreshToken = generateRefreshToken({ id: user.id, email: user.email, role: user.role });
+
+        // Update DB with new hashed RT
+        const hashedRT = await bcrypt.hash(refreshToken, 10);
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { refreshToken: hashedRT }
+        });
+
+        return { token, refreshToken };
+    } catch (err: any) {
+        throw new AppError(err.message || 'Token refresh failed.', 401);
+    }
 };
 
 /**

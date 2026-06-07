@@ -4,6 +4,7 @@ import {
     countBookingsByPrefix,
     findAllBookings,
     findBookingById,
+    findBookingByReferenceAndEmail,
     updateBookingStatus,
     BookingFilters,
 } from './booking.repository.js';
@@ -14,7 +15,8 @@ type RelatedField =
     | { tourId: string }
     | { hotelId: string }
     | { carId: string }
-    | { offerId: string };
+    | { offerId: string }
+    | { trekkingId: string };
 
 /**
  * Resolve service price based on serviceType and serviceId using transaction context.
@@ -25,6 +27,7 @@ const resolveServicePrice = async (
     startDate: string,
     endDate: string,
     numberOfPeople: number,
+    addOns: string[],
     tx: Prisma.TransactionClient
 ): Promise<{ price: number; relatedField: RelatedField }> => {
     const start = new Date(startDate).getTime();
@@ -48,7 +51,26 @@ const resolveServicePrice = async (
             const car = await tx.car.findUnique({ where: { id: serviceId } });
             if (!car) throw new AppError('Car not found.', 404);
             if (!car.available) throw new AppError('Car is not available.', 400);
-            return { price: Number(car.pricePerDay) * days, relatedField: { carId: serviceId } };
+
+            // Calculate base price
+            let basePrice = Number(car.pricePerDay) * days;
+
+            // Calculate add-ons price
+            const ADD_ON_PRICES: Record<string, number> = {
+                gps: 250,
+                child: 150,
+                wifi: 175,
+                ski: 300,
+            };
+
+            const addOnPrice = addOns.reduce((sum, id) => sum + (ADD_ON_PRICES[id] || 0) * days, 0);
+
+            // Add 12% tax (as seen on frontend)
+            const subtotal = basePrice + addOnPrice;
+            const tax = Math.round(subtotal * 0.12);
+            const finalPrice = subtotal + tax;
+
+            return { price: finalPrice, relatedField: { carId: serviceId } };
         }
         case 'OFFER': {
             const offer = await tx.offer.findUnique({ where: { id: serviceId } });
@@ -56,6 +78,12 @@ const resolveServicePrice = async (
             if (!(offer as any).active) throw new AppError('Offer is no longer active.', 400);
             const discountedPrice = Number(offer.price) - (Number(offer.price) * Number(offer.discount)) / 100;
             return { price: discountedPrice * numberOfPeople, relatedField: { offerId: serviceId } };
+        }
+        case 'TREKKING': {
+            const trekking = await tx.trekking.findUnique({ where: { id: serviceId } });
+            if (!trekking) throw new AppError('Trekking not found.', 404);
+            if (!trekking.available) throw new AppError('Trekking is not available.', 400);
+            return { price: Number(trekking.price) * numberOfPeople, relatedField: { trekkingId: serviceId } };
         }
         default:
             throw new AppError('Invalid service type.', 400);
@@ -76,6 +104,7 @@ export const createGuestBooking = async (data: any): Promise<Booking> => {
         endDate,
         numberOfPeople = 1,
         specialRequests,
+        addOns = [],
     } = data;
 
     const start = new Date(startDate);
@@ -99,6 +128,7 @@ export const createGuestBooking = async (data: any): Promise<Booking> => {
             startDate,
             endDate,
             parseInt(numberOfPeople, 10),
+            addOns,
             tx
         );
 
@@ -114,6 +144,7 @@ export const createGuestBooking = async (data: any): Promise<Booking> => {
             totalPrice: price,
             numberOfPeople: parseInt(numberOfPeople, 10),
             specialRequests: specialRequests || null,
+            addOns: Array.isArray(addOns) ? addOns : [],
             ...relatedField,
         };
 
@@ -132,4 +163,10 @@ export const getBookingById = async (id: string): Promise<Booking> => {
 export const updateBookingStatusById = async (id: string, status: string): Promise<Booking> => {
     await getBookingById(id);
     return updateBookingStatus(id, status);
+};
+
+export const trackBooking = async (bookingNumber: string, email: string): Promise<Booking> => {
+    const booking = await findBookingByReferenceAndEmail(bookingNumber, email);
+    if (!booking) throw new AppError('Booking not found with provided reference and email.', 404);
+    return booking;
 };
